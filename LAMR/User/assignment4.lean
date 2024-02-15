@@ -24,19 +24,19 @@ Remember a `Clause` is a list of literals, so you can do this, for example.
 
 namespace PropAssignment
 
--- Assuming the structure of PropAssignment and CnfForm is defined elsewhere in your imports or code
-open Lit  -- This might be necessary depending on how Lit is defined in your context
+open Lit
 
--- Helper function to check if a clause is touched by the assignment
+-- check if a clause is touched by the assignment
 def clauseIsTouched (τ : PropAssignment) (c : Clause) : Bool :=
   c.any (fun l => τ.mem l.var)
 
+-- convert an option to a bool
 def optionToBool (o : Option Bool) : Bool :=
   match o with
   | some b => b
   | none => false
 
--- Helper function to check if a touched clause is satisfied by the assignment
+-- check if a touched clause is satisfied by the assignment
 def touchedClauseIsSatisfied (τ : PropAssignment) (c : Clause) : Bool :=
   c.any (fun l => optionToBool (τ.evalLit? l))  -- Check if any literal in the clause is satisfied by τ
 
@@ -45,7 +45,7 @@ def isAutarky (τ : PropAssignment) (φ : CnfForm) : Bool :=
   φ.all (fun c =>
     if clauseIsTouched τ c
     then touchedClauseIsSatisfied τ c
-    else true)  -- If a clause is not touched, it's considered satisfied for the purpose of being an autarky
+    else true)  -- ff a clause is not touched, it's considered satisfied for the purpose of being an autarky
 
 -- for testing
 #eval isAutarky [] cnf!{p q r, -p -q -r} == true
@@ -58,19 +58,20 @@ def isAutarky (τ : PropAssignment) (φ : CnfForm) : Bool :=
 #eval isAutarky (propassign!{p, -q, v}) (cnf!{p q u -v, -u, u, -v}) == false
 #eval isAutarky (propassign!{p, -q, v, w, a, b, c, d}) (cnf!{p q u -v, -u, u}) == true
 
--- ** Fill in this definition. **
+
 -- Write in Lean a function getPure that takes a CNF formula Γ : CnfForm and
 -- returns a List Lit of all pure literals in Γ. The function does not need to find all pure literals
 -- until fixpoint, only the literals the are pure in Γ.
+-- ** Fill in this definition. **
 def getPure (φ : CnfForm) : List Lit :=
-  -- Flatten the list of clauses into a list of literals
+  -- flatten the list of clauses into a list of literals
   let lits := φ.join
 
-  -- Function to check if the negation of a literal exists in the list of literals
+  -- function to check if the negation of a literal exists in the list of literals
   let negationExists (l : Lit) (lits : List Lit) : Bool :=
     lits.any (fun l' => l'.var == l.var && l != l')
 
-  -- Filter the list of literals to only include those that are pure
+  -- filter the list of literals to only include those that are pure
   lits.filter (fun l => ¬ negationExists l lits)
 
 
