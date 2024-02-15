@@ -98,11 +98,53 @@ Exercise 2.
 
 -- Part A) Write this function
 def rectangleConstraints (m n k : Nat) : CnfForm :=
-  []
+  let initCnf1 := []
+  let initCnf2 := []
+  -- each square must have one color
+  -- for each square (i, j)
+  -- add the clause (p_{i}_{j}_1 ∨ p_{i}_{j}_2 ∨ ... ∨ p_{i}_{j}_k)
+  let oneColorPerSquare :=
+    (List.range m).foldl (λ cnf i =>
+      (List.range n).foldl (λ cnf j =>
+        let clause := (List.range k).map (λ l => Lit.pos s!"{i}_{j}_{l}")
+       cnf.append [clause]
+    ) cnf
+    ) initCnf1
+
+  -- each rectangle must not have all the same corner colors
+  -- for each rectangle with corners (i, j), (i, j + k), (i + k, j), (i + k, j + k)
+  -- and for each color c
+  -- add the clause (¬p_{i}_{j}_c ∨ ¬p_{i}_{j + k}_c ∨ ¬p_{i + k}_{j}_c ∨ ¬p_{i + k}_{j + k}_c)
+  let noMonochromeRectangles :=
+    (List.range m).foldl (λ cnf i =>
+      (List.range n).foldl (λ cnf j =>
+        -- consider all valid sizes of rectangles that can be formed from (i, j)
+        (List.range (m - i)).foldl (λ cnf i1 =>
+          (List.range (n - j)).foldl (λ cnf j1 =>
+            -- avoid adding clauses for non-rectangular or single-cell "rectangles"
+            if i1 > 0 && j1 > 0 then
+              -- for each color, ensure not all corners of the rectangle are the same color
+              let clausesForRectangle := (List.range k).map (λ color =>
+                -- create a clause that negates the proposition of all corners being the same color
+                [Lit.neg s!"{i}_{j}_{color}", Lit.neg s!"{i}_{j + j1}_{color}", Lit.neg s!"{i + i1}_{j}_{color}",
+                Lit.neg s!"{i + i1}_{j + j1}_{color}"]
+              )
+              -- add clauses for this rectangle to the CNF
+              cnf.append clausesForRectangle
+            else cnf
+          ) cnf
+        ) cnf
+      ) cnf
+    ) initCnf2
+
+  oneColorPerSquare ++ noMonochromeRectangles
+
 
 /-
 These should be satisfiable.
 -/
+
+#eval rectangleConstraints 2 3 2
 
 #eval show IO Unit from do
   let (_, result) ← callCadical <| rectangleConstraints 10 10 3
@@ -129,6 +171,18 @@ def Lit.isPos : Lit → Bool
 def decodeSolution (m n k: Nat) (τ : List Lit) : Except String (Array (Array Nat)) := do
   let mut s : Array (Array Nat) := mkArray m (mkArray n 0)
   -- use the literals to fill in the rectangle
+  -- for each literal in the solution
+  for l in τ do
+    -- if the literal is positive
+    if l.isPos then
+      -- extract the indices from the literal
+      let indices := l.var.splitOn "_"
+      let i := (indices[0]!).toNat
+      let j := (indices[1]!).toNat!
+      let color := (indices[2]!).toNat!
+      -- fill in the rectangle with the color
+      s := s.set! i (s[i]!.set! j color)
+
   return s
 
 def outputSolution (m n k : Nat) (τ : List Lit) : IO Unit :=
