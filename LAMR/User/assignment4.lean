@@ -138,13 +138,14 @@ def rectangleConstraints (m n k : Nat) : CnfForm :=
     ) initCnf2
 
   oneColorPerSquare ++ noMonochromeRectangles
-
+  -- oneColorPerSquare
+  -- noMonochromeRectangles
 
 /-
 These should be satisfiable.
 -/
 
-#eval rectangleConstraints 2 3 2
+#eval rectangleConstraints 2 2 2
 
 #eval show IO Unit from do
   let (_, result) ← callCadical <| rectangleConstraints 10 10 3
