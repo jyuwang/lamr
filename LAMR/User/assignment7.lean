@@ -257,11 +257,7 @@ theorem map_snoc (f : α → β) (xs : List α) (y : α) : map f (snoc xs y) = s
 
 -- 4E. Prove it again without induction, using `snoc_eq_apppend` and `map_append`.
 theorem map_snoc' (f : α → β) (xs : List α) (y : α) : map f (snoc xs y) = snoc (map f xs) (f y) := by
-  induction xs with
-  | nil => rw [snoc, map, snoc, map, map]
-  | cons x xs ih => rw [snoc, map, map, snoc, ih]
-
--- TODO: w/o induction
+  rw [snoc_eq_append, snoc_eq_append, map_append, map, map]
 
 /-
 Problem 5 (3 + 3 = 6 Points).
@@ -282,7 +278,9 @@ Create a world with at most three objects in which all the following sentences a
 -/
 
 def ockham : World := [
-  -- add objects here
+  { shape := Shape.tet, size := Size.large, row := 4, col := 4 },
+  { shape := Shape.cube, size := Size.medium, row := 2, col := 2 },
+  { shape := Shape.dodec, size := Size.small, row := 0, col := 0 }
 ]
 
 -- Tip: You can pin this display open using the 📌 icon in the Lean Infoview
@@ -307,7 +305,11 @@ Create as world (with as many objects as you like) in which all the following se
 -/
 
 def arnault : World := [
-  -- add objects here
+  { shape := Shape.dodec, size := Size.small, row := 5, col := 3 },
+  { shape := Shape.dodec, size := Size.small, row := 5, col := 5 },
+  { shape := Shape.cube, size := Size.small, row := 3, col := 5 },
+  { shape := Shape.tet, size := Size.medium, row := 4, col := 4 },
+  { shape := Shape.cube, size := Size.small, row := 3, col := 3 }
 ]
 
 -- Tip: You can pin this display open using the 📌 icon in the Lean Infoview
