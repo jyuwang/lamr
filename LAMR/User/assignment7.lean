@@ -51,6 +51,21 @@ example (P Q : Prop) : ((P → Q) ∨ ¬ P) ↔ (P → Q) := by
   rw [imp_iff_not_or, or_assoc, or_comm, or_assoc, or_self, or_comm, ←imp_iff_not_or]
 
 
+example (P Q : Prop) : (P → Q) → (Q → R) → (P → R) := by
+  -- intros h1 h2 hp
+  -- exact h2 (h1 hp)
+  intro h1 h2 h3
+  apply h2
+  apply h1
+  exact h3
+
+example (P Q : Prop) : P ∧ Q → Q ∨ R := by
+  intro h
+  rcases h with ⟨h1, h2⟩
+  left
+  exact h2
+
+
 /-
 Problem 2 (6 points).
 
