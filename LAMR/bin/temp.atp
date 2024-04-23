@@ -1,0 +1,11 @@
+fof(ax0,axiom,?[X] : ((animal(X)) & (X = wolf))).
+fof(ax1,axiom,?[X] : ((animal(X)) & (X = fox))).
+fof(ax2,axiom,?[X] : ((animal(X)) & (X = bird))).
+fof(ax3,axiom,?[X] : ((animal(X)) & (X = caterpillar))).
+fof(ax4,axiom,?[X] : ((animal(X)) & (X = snail))).
+fof(ax5,axiom,?[X] : ((plant(X)) & (X = grain))).
+fof(ax6,axiom,![X] : ((animal(X)) => ((likestoeat(X,allplants)) | (![Y] : (((animal(Y)) & ((smaller(Y,X)) & (likestoeat(Y,someplants)))) => (likestoeat(X,Y))))))).
+fof(ax7,axiom,![X] : ((caterpillar(X)) => (?[Y] : ((bird(Y)) & (smaller(X,Y)))))).
+fof(ax8,axiom,![X] : ((wolf(X)) => (~(likestoeat(X,fox))))).
+fof(ax9,axiom,?[X] : ((caterpillar(X)) & (likestoeat(X,someplants)))).
+fof(c1,conjecture,?[X] : (?[Y] : ((animal(X)) & ((animal(Y)) & ((likestoeat(X,Y)) & (likestoeat(Y,grains))))))).
